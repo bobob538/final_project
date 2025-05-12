@@ -3,23 +3,28 @@ header('Content-Type: application/json');
 
 // پەیوەندی بە داتابەیسەوە
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=کتێبخانە', 'بەکارهێنەر', 'تێپەڕەوشە');
+    $pdo = new PDO('mysql:host=localhost;dbname=library', 'root', '');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'پەیوەندی بە داتابەیسەوە شکستی هێنا']);
+} catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'پەیوەندی بە داتابەیسەوە شکستی هێنا: ' . $e->getMessage()]);
     exit;
 }
 
 // پشکنینی زانیارییەکان
-$required = ['title', 'author', 'year', 'pdf'];
+$required = ['title', 'author', 'year'];
 foreach ($required as $field) {
-    if (empty($_POST[$field]) {
+    if (empty($_POST[$field])) {
         echo json_encode(['success' => false, 'message' => 'تکایە هەموو خانە پێویستەکان پڕ بکەرەوە']);
         exit;
     }
 }
 
 // فایلی PDF
+if (!isset($_FILES['pdf']) || $_FILES['pdf']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'message' => 'تکایە فایلێکی دروست هەڵبگرە']);
+    exit;
+}
+
 $pdf = $_FILES['pdf'];
 $allowedTypes = ['application/pdf'];
 $maxSize = 10 * 1024 * 1024; // 10MB
@@ -48,19 +53,19 @@ $targetPath = 'uploads/' . $filename;
 if (move_uploaded_file($pdf['tmp_name'], $targetPath)) {
     // تۆمارکردن لە داتابەیس
     try {
-        $stmt = $pdo->prepare("INSERT INTO کتێبەکان (ناو, نوسەر, ساڵ, بەش, pdf) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO books (title, author, year, category, pdf_path) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
             $_POST['title'],
             $_POST['author'],
             $_POST['year'],
-            $_POST['category'],
+            $_POST['category'] ?? null, // Optional field
             $targetPath
         ]);
         
         echo json_encode(['success' => true, 'message' => 'کتێبەکە بە سەرکەوتوویی زیادکرا!']);
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         unlink($targetPath); // سڕینەوەی فایل ئەگەر تۆمارکردن شکستی هێنا
-        echo json_encode(['success' => false, 'message' => 'هەڵە لە تۆمارکردنی کتێب']);
+        echo json_encode(['success' => false, 'message' => 'هەڵە لە تۆمارکردنی کتێب: ' . $e->getMessage()]);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'هەڵە لە هەڵگرتنی فایل']);

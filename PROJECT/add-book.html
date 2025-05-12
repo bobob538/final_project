@@ -133,7 +133,7 @@
             cursor: not-allowed;
         }
         
-        #fileStatus {
+        #fileStatus, #imageStatus {
             margin-top: 5px;
             font-size: 14px;
             color: #e74c3c;
@@ -190,109 +190,135 @@
                 <div id="fileStatus">PDF کتێبەکە هەڵبگرە</div>
             </div>
             
+            <div class="form-group">
+                <label for="images">وێنەکان:</label>
+                <input type="file" id="images" name="images" required>
+                <div id="imageStatus">وێنەکان هەڵبگرە</div>
+            </div>
+            
             <button type="submit" id="submitBtn" class="btn" disabled>زیادکردنی کتێب</button>
         </form>
         
         <div id="successMessage" class="success-message" style="display: none;"></div>
     </div>
 
-    <script >
-         document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('bookForm');
-        const inputs = form.querySelectorAll('input[required]');
-        const pdfInput = document.getElementById('pdf');
-        const submitBtn = document.getElementById('submitBtn');
-        const fileStatus = document.getElementById('fileStatus');
-        const successMessage = document.getElementById('successMessage');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('bookForm');
+            const inputs = form.querySelectorAll('input[required]');
+            const pdfInput = document.getElementById('pdf');
+            const imageInput = document.getElementById('images');
+            const submitBtn = document.getElementById('submitBtn');
+            const fileStatus = document.getElementById('fileStatus');
+            const imageStatus = document.getElementById('imageStatus');
+            const successMessage = document.getElementById('successMessage');
 
-        // Function to check if all required fields are filled
-        function checkFormValidity() {
-            let allFilled = true;
-            
-            // Check text inputs
-            inputs.forEach(input => {
-                if (input.type !== 'file' && !input.value.trim()) {
-                    allFilled = false;
-                }
-            });
-            
-            // Check PDF file
-            if (!pdfInput.files || !pdfInput.files[0]) {
-                allFilled = false;
-            } else {
-                const file = pdfInput.files[0];
-                if (file.type !== 'application/pdf') {
+            // Function to check if all required fields are filled
+            function checkFormValidity() {
+                let allFilled = true;
+
+                // Check required text inputs
+                inputs.forEach(input => {
+                    if (input.type !== 'file' && input.hasAttribute('required') && !input.value.trim()) {
+                        allFilled = false;
+                    }
+                });
+
+                // Check PDF file
+                if (!pdfInput.files || !pdfInput.files[0]) {
                     fileStatus.textContent = 'تکایە فایلێکی PDF هەڵبگرە';
                     fileStatus.style.color = '#e74c3c';
                     allFilled = false;
                 } else {
-                    fileStatus.textContent = `فایل هەڵگیرا: ${file.name}`;
-                    fileStatus.style.color = '#27ae60';
+                    const file = pdfInput.files[0];
+                    if (file.type !== 'application/pdf') {
+                        fileStatus.textContent = 'تکایە فایلێکی PDF هەڵبگرە';
+                        fileStatus.style.color = '#e74c3c';
+                        allFilled = false;
+                    } else {
+                        fileStatus.textContent = `فایل هەڵگیرا: ${file.name}`;
+                        fileStatus.style.color = '#27ae60';
+                    }
                 }
-            }
-            
-            // Enable/disable button
-            submitBtn.disabled = !allFilled;
-            return allFilled;
-        }
 
-        // Add event listeners to all inputs
-        inputs.forEach(input => {
-            input.addEventListener('input', checkFormValidity);
-        });
-        
-        // Special handling for file input
-        pdfInput.addEventListener('change', checkFormValidity);
-
-        // Form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!checkFormValidity()) {
-                alert('تکایە هەموو خانە پێویستەکان پڕ بکەرەوە');
-                return;
-            }
-            
-            const formData = new FormData(form);
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'لە پڕۆسەی ناردندا...';
-            
-            fetch('save-book.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('هەڵە لە ناردنی زانیارییەکان');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    form.style.display = 'none';
-                    successMessage.textContent = 'کتێبەکە بە سەرکەوتوویی زیادکرا! بەرەو پەرەی کتێبەکان...';
-                    successMessage.style.display = 'block';
-                    
-                    // Redirect after 3 seconds
-                    setTimeout(() => {
-                        window.location.href = 'books.php';
-                    }, 3000);
+                // Check images file
+                if (!imageInput.files || !imageInput.files[0]) {
+                    imageStatus.textContent = 'تکایە فایلێکی وێنە هەڵبگرە';
+                    imageStatus.style.color = '#e74c3c';
+                    allFilled = false;
                 } else {
-                    alert('هەڵە: ' + (data.message || 'هەڵەیەکی نادیار ڕوویدا'));
+                    const file = imageInput.files[0];
+                    imageStatus.textContent = `فایل هەڵگیرا: ${file.name}`;
+                    imageStatus.style.color = '#27ae60';
+                }
+
+                // Enable/disable button
+                submitBtn.disabled = !allFilled;
+
+                return allFilled; // Explicitly return the validity status
+            }
+
+            // Add event listeners to all inputs
+            inputs.forEach(input => {
+                input.addEventListener('input', checkFormValidity);
+            });
+
+            // Special handling for file inputs
+            pdfInput.addEventListener('change', checkFormValidity);
+            imageInput.addEventListener('change', checkFormValidity);
+
+            // Initial validation check
+            checkFormValidity();
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!checkFormValidity()) {
+                    alert('تکایە هەموو خانە پێویستەکان پڕ بکەرەوە');
+                    return;
+                }
+                
+                const formData = new FormData(form);
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'لە پڕۆسەی ناردندا...';
+                
+                fetch('save-book.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('هەڵە لە ناردنی زانیارییەکان');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        form.style.display = 'none';
+                        successMessage.textContent = 'کتێبەکە بە سەرکەوتوویی زیادکرا! بەرەو پەرەی کتێبەکان...';
+                        successMessage.style.display = 'block';
+                        
+                        // Redirect after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = 'books.php';
+                        }, 3000);
+                    } else {
+                        alert('هەڵە: ' + (data.message || 'هەڵەیەکی نادیار ڕوویدا'));
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'زیادکردنی کتێب';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('هەڵەیەک ڕوویدا: ' + error.message);
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'زیادکردنی کتێب';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('هەڵەیەک ڕوویدا: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'زیادکردنی کتێب';
+                });
             });
         });
-    });
     </script>
 </body>
 </html>
