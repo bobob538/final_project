@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>زیادکردنی کتێب</title>
+    <style>
+        /* ڕێگای گشتی */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 0;
+            text-align: right;
+        }
+        
+        /* ناوبار */
+        nav {
+            background-color: #2c3e50;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            color: #3498db;
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .nav-links a.active {
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        /* بەشی سەرەکی */
+        .main-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], 
+        input[type="number"], 
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        #fileStatus, #imageStatus {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #e74c3c;
+        }
+        
+        .success-message {
+            color: #27ae60;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">کتێبخانە</a>
+            <ul class="nav-links">
+                <li><a href="index.html">پەرەی سەرەکی</a></li>
+                <li><a href="books.php">کتێبەکان</a></li>
+                <li><a href="search.html">گەڕان</a></li>
+                <li><a href="add-book.html">زیادکردنی کتێب</a></li>
+                <li><a href="login.php">چونەژورەوە</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <h1>زیادکردنی کتێبی نوێ</h1>
+        <form id="bookForm" action="save-book.php" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">ناوی کتێب:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="author">نوسەر:</label>
+                <input type="text" id="author" name="author" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="year">ساڵی دەرچوون:</label>
+                <input type="number" id="year" name="year" min="1900" max="2099" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">بەش:</label>
+                <input type="text" id="category" name="category">
+            </div>
+            
+            <div class="form-group">
+                <label for="pdf">فایلی PDF:</label>
+                <input type="file" id="pdf" name="pdf" accept=".pdf" required>
+                <div id="fileStatus">PDF کتێبەکە هەڵبگرە</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="images">وێنەکان:</label>
+                <input type="file" id="images" name="images" required>
+                <div id="imageStatus">وێنەکان هەڵبگرە</div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="btn" disabled>زیادکردنی کتێب</button>
+        </form>
+        
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('bookForm');
+            const inputs = form.querySelectorAll('input[required]');
+            const pdfInput = document.getElementById('pdf');
+            const imageInput = document.getElementById('images');
+            const submitBtn = document.getElementById('submitBtn');
+            const fileStatus = document.getElementById('fileStatus');
+            const imageStatus = document.getElementById('imageStatus');
+            const successMessage = document.getElementById('successMessage');
+
+            // Function to check if all required fields are filled
+            function checkFormValidity() {
+                let allFilled = true;
+
+                // Check required text inputs
+                inputs.forEach(input => {
+                    if (input.type !== 'file' && input.hasAttribute('required') && !input.value.trim()) {
+                        allFilled = false;
+                    }
+                });
+
+                // Check PDF file
+                if (!pdfInput.files || !pdfInput.files[0]) {
+                    fileStatus.textContent = 'تکایە فایلێکی PDF هەڵبگرە';
+                    fileStatus.style.color = '#e74c3c';
+                    allFilled = false;
+                } else {
+                    const file = pdfInput.files[0];
+                    if (file.type !== 'application/pdf') {
+                        fileStatus.textContent = 'تکایە فایلێکی PDF هەڵبگرە';
+                        fileStatus.style.color = '#e74c3c';
+                        allFilled = false;
+                    } else {
+                        fileStatus.textContent = `فایل هەڵگیرا: ${file.name}`;
+                        fileStatus.style.color = '#27ae60';
+                    }
+                }
+
+                // Check images file
+                if (!imageInput.files || !imageInput.files[0]) {
+                    imageStatus.textContent = 'تکایە فایلێکی وێنە هەڵبگرە';
+                    imageStatus.style.color = '#e74c3c';
+                    allFilled = false;
+                } else {
+                    const file = imageInput.files[0];
+                    imageStatus.textContent = `فایل هەڵگیرا: ${file.name}`;
+                    imageStatus.style.color = '#27ae60';
+                }
+
+                // Enable/disable button
+                submitBtn.disabled = !allFilled;
+
+                return allFilled; // Explicitly return the validity status
+            }
+
+            // Add event listeners to all inputs
+            inputs.forEach(input => {
+                input.addEventListener('input', checkFormValidity);
+            });
+
+            // Special handling for file inputs
+            pdfInput.addEventListener('change', checkFormValidity);
+            imageInput.addEventListener('change', checkFormValidity);
+
+            // Initial validation check
+            checkFormValidity();
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!checkFormValidity()) {
+                    alert('تکایە هەموو خانە پێویستەکان پڕ بکەرەوە');
+                    return;
+                }
+                
+                const formData = new FormData(form);
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'لە پڕۆسەی ناردندا...';
+                
+                fetch('save-book.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('هەڵە لە ناردنی زانیارییەکان');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        form.style.display = 'none';
+                        successMessage.textContent = 'کتێبەکە بە سەرکەوتوویی زیادکرا! بەرەو پەرەی کتێبەکان...';
+                        successMessage.style.display = 'block';
+                        
+                        // Redirect after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = 'books.php';
+                        }, 3000);
+                    } else {
+                        alert('هەڵە: ' + (data.message || 'هەڵەیەکی نادیار ڕوویدا'));
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'زیادکردنی کتێب';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('هەڵەیەک ڕوویدا: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'زیادکردنی کتێب';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
