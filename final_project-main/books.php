@@ -2,7 +2,8 @@
 session_start();
 require_once "confing.php";
 
-$sql = "SELECT title, author, year, category, pdf_path, images FROM books";
+// Use image_path instead of images
+$sql = "SELECT title, author, year, category, pdf_path, image_path FROM books";
 $result = mysqli_query($conn, $sql);
 
 $books = [];
@@ -337,7 +338,11 @@ if ($result && mysqli_num_rows($result) > 0) {
                 <?php foreach ($books as $book): ?>
                     <div class="book-card">
                         <div class="book-cover">
-                            <span>وێنەی <?= htmlspecialchars($book['title']) ?></span>
+                            <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
+                                <img src="<?= htmlspecialchars($book['image_path']) ?>" alt="وێنەی <?= htmlspecialchars($book['title']) ?>" style="width:100%; height:100%; object-fit:cover;" />
+                            <?php else: ?>
+                                <span>وێنەی <?= htmlspecialchars($book['title']) ?></span>
+                            <?php endif; ?>
                             <div class="book-pdf-icon">PDF</div>
                         </div>
                         <div class="book-details">

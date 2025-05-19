@@ -2,7 +2,8 @@
 session_start();
 require_once "confing.php";
 
-$sql = "SELECT id, title, author, year, category, pdf_path, images FROM books";
+// Use image_path instead of images
+$sql = "SELECT title, author, year, category, pdf_path, image_path FROM books";
 $books = [];
 
 try {
@@ -338,15 +339,20 @@ try {
                 <?php foreach ($books as $book): ?>
                     <div class="book-card">
                         <div class="book-cover">
-    <!-- Display the book image -->
+                            <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
+                                <img src="<?= htmlspecialchars($book['image_path']) ?>" alt="وێنەی <?= htmlspecialchars($book['title']) ?>" style="width:100%; height:100%; object-fit:cover;" />
+                            <?php else: ?>
+                             <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
     <img
-      src="image.php?id=<?= htmlspecialchars($book['id']) ?>"
-      alt="عکسێکی <?= htmlspecialchars($book['title']) ?>"
+      src="<?= htmlspecialchars($book['image_path']) ?>"
+      alt="وێنەی <?= htmlspecialchars($book['title']) ?>"
       style="width:100%; height:100%; object-fit:cover;"
     />
-    <div class="book-pdf-icon">PDF</div>
-</div>
-
+<?php else: ?>
+<?php endif; ?>
+                            <?php endif; ?>
+                            <div class="book-pdf-icon">PDF</div>
+                        </div>
                         <div class="book-details">
                             <h3 class="book-title"><?= htmlspecialchars($book['title']) ?></h3>
                             <p class="book-author">نوسەر: <?= htmlspecialchars($book['author']) ?></p>

@@ -191,9 +191,9 @@
             </div>
             
             <div class="form-group">
-                <label for="images">وێنەکان:</label>
-                <input type="file" id="images" name="images" required>
-                <div id="imageStatus">وێنەکان هەڵبگرە</div>
+                <label for="image">وێنە:</label>
+                <input type="file" id="image" name="image" required>
+                <div id="imageStatus">وێنە هەڵبگرە</div>
             </div>
             
             <button type="submit" id="submitBtn" class="btn" disabled>زیادکردنی کتێب</button>
@@ -207,7 +207,7 @@
             const form = document.getElementById('bookForm');
             const inputs = form.querySelectorAll('input[required]');
             const pdfInput = document.getElementById('pdf');
-            const imageInput = document.getElementById('images');
+            const imageInput = document.getElementById('image');
             const submitBtn = document.getElementById('submitBtn');
             const fileStatus = document.getElementById('fileStatus');
             const imageStatus = document.getElementById('imageStatus');

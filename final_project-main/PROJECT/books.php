@@ -2,7 +2,7 @@
 session_start();
 require_once "confing.php";
 
-$sql = "SELECT id, title, author, year, category, pdf_path, images FROM books";
+$sql = "SELECT id, title, author, year, category, pdf_path, image_path FROM books";
 $books = [];
 
 try {

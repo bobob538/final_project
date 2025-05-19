@@ -51,20 +51,49 @@ $targetPath = 'uploads/' . $filename;
 
 // هەڵگرتنی فایل
 if (move_uploaded_file($pdf['tmp_name'], $targetPath)) {
+    // پەیوەندیدانی وێنە (اختیاری)
+    $imagePath = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $image = $_FILES['image'];
+        $allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $maxImageSize = 5 * 1024 * 1024; // 5MB
+
+        if (!in_array($image['type'], $allowedImageTypes)) {
+            echo json_encode(['success' => false, 'message' => 'تکایە تەنها وێنەی JPG, PNG یان GIF هەڵبگرە']);
+            exit;
+        }
+        if ($image['size'] > $maxImageSize) {
+            echo json_encode(['success' => false, 'message' => 'قەبارەی وێنە زۆر گەورەە (کەمتر لە 5MB)']);
+            exit;
+        }
+
+        if (!file_exists('uploads/images')) {
+            mkdir('uploads/images', 0777, true);
+        }
+        $imageFilename = uniqid() . '_' . basename($image['name']);
+        $imagePath = 'uploads/images/' . $imageFilename;
+        if (!move_uploaded_file($image['tmp_name'], $imagePath)) {
+            echo json_encode(['success' => false, 'message' => 'هەڵە لە هەڵگرتنی وێنە']);
+            exit;
+        }
+    }
+
     // تۆمارکردن لە داتابەیس
     try {
-        $stmt = $pdo->prepare("INSERT INTO books (title, author, year, category, pdf_path) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO books (title, author, year, category, pdf_path, image_path) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $_POST['title'],
             $_POST['author'],
             $_POST['year'],
-            $_POST['category'] ?? null, // Optional field
-            $targetPath
+            $_POST['category'] ?? null,
+            $targetPath,   // PDF path
+            $imagePath     // Image path (or null)
         ]);
         
         echo json_encode(['success' => true, 'message' => 'کتێبەکە بە سەرکەوتوویی زیادکرا!']);
     } catch (PDOException $e) {
         unlink($targetPath); // سڕینەوەی فایل ئەگەر تۆمارکردن شکستی هێنا
+        if ($imagePath) unlink($imagePath);
         echo json_encode(['success' => false, 'message' => 'هەڵە لە تۆمارکردنی کتێب: ' . $e->getMessage()]);
     }
 } else {

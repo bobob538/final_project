@@ -427,7 +427,15 @@ if (!empty($title) || !empty($author) || !empty($category) || !empty($year)) {
                 <?php foreach ($search_results as $book): ?>
                     <div class="book-card">
                         <div class="book-cover">
-                            <span>وێنەی <?= htmlspecialchars($book['title']) ?></span>
+                          <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
+    <img
+      src="<?= htmlspecialchars($book['image_path']) ?>"
+      alt="وێنەی <?= htmlspecialchars($book['title']) ?>"
+      style="width:100%; height:100%; object-fit:cover;"
+    />
+<?php else: ?>
+    <span>وێنەی <?= htmlspecialchars($book['title']) ?></span>
+<?php endif; ?>
                             <div class="book-pdf-icon">PDF</div>
                         </div>
                         <div class="book-details">
