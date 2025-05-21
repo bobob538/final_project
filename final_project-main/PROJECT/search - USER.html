@@ -363,90 +363,95 @@
             </form>
         </section>
         
-        <?php
-        // Check if search parameters are set
-        $title = isset($_GET['title']) ? trim($_GET['title']) : '';
-        $author = isset($_GET['author']) ? trim($_GET['author']) : '';
-        $category = isset($_GET['category']) ? trim($_GET['category']) : '';
-        $year = isset($_GET['year']) ? trim($_GET['year']) : '';
+        <!--
+<?php
+// Check if search parameters are set
+$title = isset($_GET['title']) ? trim($_GET['title']) : '';
+$author = isset($_GET['author']) ? trim($_GET['author']) : '';
+$category = isset($_GET['category']) ? trim($_GET['category']) : '';
+$year = isset($_GET['year']) ? trim($_GET['year']) : '';
 
-        // Include database connection
-        require_once 'confing.php'; // Ensure this matches your file name
+// Include database connection
+require_once 'confing.php'; // Ensure this matches your file name
 
-        // Prepare search query
-        $search_results = [];
-        if (!empty($title) || !empty($author) || !empty($category) || !empty($year)) {
-            $query = "SELECT * FROM books WHERE 1=1";
-            $params = [];
-            $types = '';
+// Prepare search query
+$search_results = [];
+if (!empty($title) || !empty($author) || !empty($category) || !empty($year)) {
+    $query = "SELECT * FROM books WHERE 1=1";
+    $params = [];
+    $types = '';
 
-            if (!empty($title)) {
-                $query .= " AND title LIKE ?";
-                $params[] = "%{$title}%";
-                $types .= 's';
-            }
-            if (!empty($author)) {
-                $query .= " AND author LIKE ?";
-                $params[] = "%{$author}%";
-                $types .= 's';
-            }
-            if (!empty($category)) {
-                $query .= " AND category = ?";
-                $params[] = $category;
-                $types .= 's';
-            }
-            if (!empty($year)) {
-                $query .= " AND year = ?";
-                $params[] = $year;
-                $types .= 's';
-            }
+    if (!empty($title)) {
+        $query .= " AND title LIKE ?";
+        $params[] = "%{$title}%";
+        $types .= 's';
+    }
+    if (!empty($author)) {
+        $query .= " AND author LIKE ?";
+        $params[] = "%{$author}%";
+        $types .= 's';
+    }
+    if (!empty($category)) {
+        $query .= " AND category = ?";
+        $params[] = $category;
+        $types .= 's';
+    }
+    if (!empty($year)) {
+        $query .= " AND year = ?";
+        $params[] = $year;
+        $types .= 's';
+    }
 
-            // Use MySQLi for the query
-            $stmt = $mysqli->prepare($query);
-            if ($stmt) {
-                if (!empty($params)) {
-                    $stmt->bind_param($types, ...$params);
-                }
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $search_results = $result->fetch_all(MYSQLI_ASSOC);
-                $stmt->close();
-            } else {
-                echo "Error preparing statement: " . $mysqli->error;
-            }
+    // Use MySQLi for the query
+    $stmt = $mysqli->prepare($query);
+    if ($stmt) {
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
         }
-        ?>
-        
-        <?php if (!empty($search_results)): ?>
-            <div class="books-grid">
-                <?php foreach ($search_results as $book): ?>
-                    <div class="book-card">
-                        <div class="book-cover">
-                          <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
-    <img
-      src="<?= htmlspecialchars($book['image_path']) ?>"
-      alt="وێنەی <?= htmlspecialchars($book['title']) ?>"
-      style="width:100%; height:100%; object-fit:cover;"
-    />
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $search_results = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+    } else {
+        echo "Error preparing statement: " . $mysqli->error;
+    }
+}
+?>
+<?php if (!empty($search_results)): ?>
+    <div class="books-grid">
+        <?php foreach ($search_results as $book): ?>
+            <div class="book-card">
+                <div class="book-cover">
+                  <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
+<img
+  src="<?= htmlspecialchars($book['image_path']) ?>"
+  alt="وێنەی <?= htmlspecialchars($book['title']) ?>"
+  style="width:100%; height:100%; object-fit:cover;"
+/>
 <?php else: ?>
-    <span>وێنەی <?= htmlspecialchars($book['title']) ?></span>
+<span>وێنەی <?= htmlspecialchars($book['title']) ?></span>
 <?php endif; ?>
-                            <div class="book-pdf-icon">PDF</div>
-                        </div>
-                        <div class="book-details">
-                            <h3 class="book-title"><?= htmlspecialchars($book['title']) ?></h3>
-                            <p class="book-author">نوسەر: <?= htmlspecialchars($book['author']) ?></p>
-                            <div class="book-meta">
-                                <span class="book-year">📅 <?= htmlspecialchars($book['year']) ?></span>
-                                <?php if (!empty($book['category'])): ?>
-                                    <span class="book-category">🏷️ <?= htmlspecialchars($book['category']) ?></span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="book-actions">
-                                <a href="<?= htmlspecialchars($book['pdf_path']) ?>" target="_blank" class="view-btn">بینین</a>
-                                <a href="<?= htmlspecialchars($book['pdf_path']) ?>" download class="download-btn">داگرتن</a>
-                            </div>
-                        </div>
-                                </div>
-                                </body>
+                    <div class="book-pdf-icon">PDF</div>
+                </div>
+                <div class="book-details">
+                    <h3 class="book-title"><?= htmlspecialchars($book['title']) ?></h3>
+                    <p class="book-author">نوسەر: <?= htmlspecialchars($book['author']) ?></p>
+                    <div class="book-meta">
+                        <span class="book-year">📅 <?= htmlspecialchars($book['year']) ?></span>
+                        <?php if (!empty($book['category'])): ?>
+                            <span class="book-category">🏷️ <?= htmlspecialchars($book['category']) ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="book-actions">
+                        <a href="<?= htmlspecialchars($book['pdf_path']) ?>" target="_blank" class="view-btn">بینین</a>
+                        <a href="<?= htmlspecialchars($book['pdf_path']) ?>" download class="download-btn">داگرتن</a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+-->
+    </main>
+</body>
 </html>
