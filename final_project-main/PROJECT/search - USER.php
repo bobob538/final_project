@@ -376,8 +376,8 @@ if (!empty($title) || !empty($author) || !empty($category) || !empty($year)) {
             <a href="index - USER.html" class="logo">کتێبخانە</a>
             <ul class="nav-links">
                 <li><a href="index - USER.html">پەرەی سەرەکی</a></li>
-                <li><a href="books - USER.php"class="active">کتێبەکان</a></li>
-                <li><a href="search - USER.html">گەڕان</a></li>
+                <li><a href="books - USER.php">کتێبەکان</a></li>
+                <li><a href="search - USER.html"class="active">گەڕان</a></li>
                <!-- <li><a href="add-book.html">زیادکردنی کتێب</a></li>-->
                 <li><a href="login.php">چونەژورەوە</a></li>
             </ul>

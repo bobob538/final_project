@@ -134,7 +134,7 @@ try {
         }
         
         .book-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-20px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         
@@ -338,14 +338,17 @@ try {
                 <?php foreach ($books as $book): ?>
                     <div class="book-card">
                         <div class="book-cover">
-    <!-- Display the book image -->
-    <img
-      src="image.php?id=<?= htmlspecialchars($book['id']) ?>"
-      alt="عکسێکی <?= htmlspecialchars($book['title']) ?>"
-      style="width:100%; height:100%; object-fit:cover;"
-    />
-    <div class="book-pdf-icon">PDF</div>
-</div>
+                            <?php if (!empty($book['image_path']) && file_exists($book['image_path'])): ?>
+                                <img
+                                    src="<?= htmlspecialchars($book['image_path']) ?>"
+                                    alt="وێنەی <?= htmlspecialchars($book['title']) ?>"
+                                    style="width:100%; height:100%; object-fit:cover;"
+                                />
+                            <?php else: ?>
+                                <span style="color:#aaa; font-size:18px;">وێنە نییە</span>
+                            <?php endif; ?>
+                            <div class="book-pdf-icon">PDF</div>
+                        </div>
 
                         <div class="book-details">
                             <h3 class="book-title"><?= htmlspecialchars($book['title']) ?></h3>

@@ -1,4 +1,3 @@
-
 <head>
 
    
@@ -84,7 +83,7 @@ nav .container {
             padding: 20px;
         }
     .bd{
-        height: 600px;
+        min-height: 400px;
     }
     /* پێنجەرە */
         footer {
@@ -156,12 +155,15 @@ if (!filter_var($email,FILTER_VALIDATE_EMAIL)) {
 if (strlen($Password)<8) {//boi passwordaka la 8 pit kamtr nabet
 array_push($errors,"password must be 8 charecters long enogh");
 }
+if (strlen($phone)>12) {//boi passwordaka la 8 pit kamtr nabet
+array_push($errors,"phone must not exeed 12 charecters");
+}
 if ($Password!==$PasswordRepeat) {//boi bzanin passwordaka yaksana yan na
 array_push($errors,"password does not match");
 }
-require_once "database.php";
+require_once "dabase.php";
 $sql ="SELECT * FROM users WHERE email ='$email'";//boi emaly dubara war nagret
-$result = mysqli_query($conn, $sql);
+$result = mysqli_query($coon, $sql);
 $rowCount = mysqli_num_rows($result);
 if ($rowCount) {
    array_push($errors,"Email already exists!");
@@ -177,7 +179,7 @@ else{
    //we will insert the data into database
  
    $sql ="INSERT INTO users (full_name, email, password, phone, city)VALUES (?,?,?,?,?)";//($fullname, $email, $Password, $phone, $city) amashian akret bas bo sql injection asantra shkani
-$stmt = mysqli_stmt_init($conn);
+$stmt = mysqli_stmt_init($coon);
 $preparestmt = mysqli_stmt_prepare($stmt,$sql);
 if ($preparestmt) {
    mysqli_stmt_bind_param($stmt,"sssss", $fullname, $email, $Password_Hash, $phone, $city);
